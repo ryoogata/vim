@@ -1,0 +1,533 @@
+" URL: http://vim.wikia.com/wiki/Example_vimrc
+" Authors: http://vim.wikia.com/wiki/Vim_on_Freenode
+" Description: A minimal, but feature rich, example .vimrc. If you are a
+"              newbie, basing your first .vimrc on this file is a good choice.
+"              If you're a more advanced user, building your own .vimrc based
+"              on this file is still a good idea.
+ 
+"------------------------------------------------------------
+"
+" Features {{{1
+"
+" These options and commands enable some very useful features in Vim, that
+" no user should have to live without.
+
+" Set 'nocompatible' to ward off unexpected things that your distro might
+" have made, as well as sanely reset options when re-sourcing .vimrc
+" Vi互換モードをオフ（Vimの拡張機能を有効）
+set nocompatible
+ 
+" Attempt to determine the type of a file based on its name and possibly its
+" contents.  Use this to allow intelligent auto-indenting for each filetype,
+" and for plugins that are filetype specific.
+" ファイル名と内容によってファイルタイプを判別し、ファイルタイププラグインを有効にする
+filetype indent plugin on
+ 
+" Enable syntax highlighting
+" 色づけをオン
+syntax on
+ 
+ 
+"------------------------------------------------------------
+" Must have options {{{1
+"
+" These are highly recommended options.
+" 強く推奨するオプション
+ 
+" One of the most important options to activate. Allows you to switch from an
+" unsaved buffer without saving it first. Also allows you to keep an undo
+" history for multiple files. Vim will complain if you try to quit without
+" saving, and swap files will keep you safe if your computer crashes.
+" バッファを保存しなくても他のバッファを表示できるようにする
+set hidden
+ 
+" Better command-line completion
+" コマンドライン補完を便利に
+set wildmenu
+ 
+" Show partial commands in the last line of the screen
+" タイプ途中のコマンドを画面最下行に表示
+set showcmd
+ 
+" Highlight searches (use <C-L> to temporarily turn off highlighting; see the
+" mapping of <C-L> below)
+" 検索語を強調表示（<C-L>を押すと現在の強調表示を解除する）
+set hlsearch
+ 
+" Modelines have historically been a source of security vulnerabilities.  As
+" such, it may be a good idea to disable them and use the securemodelines
+" script, <http://www.vim.org/scripts/script.php?script_id=1876>.
+" 歴史的にモードラインはセキュリティ上の脆弱性になっていたので、
+" オフにして代わりに上記のsecuremodelinesスクリプトを使うとよい。
+" set nomodeline
+ 
+
+"------------------------------------------------------------
+" Usability options {{{1
+"
+" These are options that users frequently set in their .vimrc. Some of them
+" change Vim's behaviour in ways which deviate from the true Vi way, but
+" which are considered to add usability. Which, if any, of these options to
+" use is very much a personal preference, but they are harmless.
+ 
+" Use case insensitive search, except when using capital letters
+" 検索時に大文字・小文字を区別しない。ただし、検索後に大文字小文字が
+" 混在しているときは区別する
+set ignorecase
+set smartcase
+ 
+" Allow backspacing over autoindent, line breaks and start of insert action
+" オートインデント、改行、インサートモード開始直後にバックスペースキーで
+" 削除できるようにする。
+set backspace=indent,eol,start
+ 
+" When opening a new line and no filetype-specific indenting is enabled, keep
+" the same indent as the line you're currently on. Useful for READMEs, etc.
+" オートインデント
+set autoindent
+ 
+" Stop certain movements from always going to the first character of a line.
+" While this behaviour deviates from that of Vi, it does what most users
+" coming from other editors would expect.
+" 移動コマンドを使ったとき、行頭に移動しない
+set nostartofline
+ 
+" Display the cursor position on the last line of the screen or in the status
+" line of a window
+" 画面最下行にルーラーを表示する
+set ruler
+ 
+" Always display the status line, even if only one window is displayed
+" ステータスラインを常に表示する
+set laststatus=2
+ 
+" Instead of failing a command because of unsaved changes, instead raise a
+" dialogue asking if you wish to save changed files.
+" バッファが変更されているとき、コマンドをエラーにするのでなく、保存する
+" かどうか確認を求める
+set confirm
+ 
+" Use visual bell instead of beeping when doing something wrong
+" ビープの代わりにビジュアルベル（画面フラッシュ）を使う
+" set visualbell
+ 
+" And reset the terminal code for the visual bell.  If visualbell is set, and
+" this line is also included, vim will neither flash nor beep.  If visualbell
+" is unset, this does nothing.
+" そしてビジュアルベルも無効化する
+set t_vb=
+ 
+" Enable use of the mouse for all modes
+" 全モードでマウスを有効化
+"set mouse=a
+ 
+" Set the command window height to 2 lines, to avoid many cases of having to
+" "press <Enter> to continue"
+" コマンドラインの高さを2行に
+set cmdheight=1
+ 
+" Display line numbers on the left
+" 行番号を表示
+set number
+ 
+" Quickly time out on keycodes, but never time out on mappings
+" キーコードはすぐにタイムアウト。マッピングはタイムアウトしない
+set notimeout ttimeout ttimeoutlen=200
+ 
+" Use <F11> to toggle between 'paste' and 'nopaste'
+" <F11>キーで'paste'と'nopaste'を切り替える
+set pastetoggle=<F11>
+
+" vimの改行時に自動でコメントが挿入されるのやめる
+autocmd FileType * setlocal formatoptions-=ro 
+
+" ステータスラインには次の情報を表示させる
+" 編集中のファイル名
+" 編集中のファイルフォーマット（DOS、Unix）
+" Vimが認識している現在のファイルタイプ
+" ドキュメント中の位置を示す行および列番号
+" ファイルの長さ（行数）
+" 現在の時間
+function! g:Date()
+  return strftime("%x %H:%M")
+endfunction
+set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]\ %{g:Date()}
+
+"入力モード時、ステータスラインのカラーを変更
+let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=yellow cterm=none'
+
+if has('syntax')
+  augroup InsertHook
+    autocmd!
+    autocmd InsertEnter * call s:StatusLine('Enter')
+    autocmd InsertLeave * call s:StatusLine('Leave')
+  augroup END
+endif
+
+let s:slhlcmd = ''
+function! s:StatusLine(mode)
+  if a:mode == 'Enter'
+    silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
+    silent exec g:hi_insert
+  else
+    highlight clear StatusLine
+    silent exec s:slhlcmd
+  endif
+endfunction
+
+function! s:GetHighlight(hi)
+  redir => hl
+  exec 'highlight '.a:hi
+  redir END
+  let hl = substitute(hl, '[\r\n]', '', 'g')
+  let hl = substitute(hl, 'xxx', '', '')
+  return hl
+endfunction
+
+"if has("win32") || has("win64") 
+"  set rtp+=~/vimfiles/bundle/vundle 
+"  call vundle#rc('~/vimfiles/bundle') 
+"else 
+"  set rtp+=~/.vim/bundle/vundle 
+"  call vundle#rc() 
+"endif 
+"
+"Bundle 'gmarik/vundle' 
+
+"------------------------------------------------------------
+" Indentation options {{{1
+" インデント関連のオプション {{{1
+"
+" Indentation settings according to personal preference.
+ 
+" Indentation settings for using 2 spaces instead of tabs.
+" Do not change 'tabstop' from its default value of 8 with this setup.
+" タブ文字の代わりにスペース2個を使う場合の設定。
+" この場合、'tabstop'はデフォルトの8から変えない。
+set shiftwidth=2
+set softtabstop=2
+set expandtab
+ 
+" Indentation settings for using hard tabs for indent. Display tabs as
+" two characters wide.
+" インデントにハードタブを使う場合の設定。
+" タブ文字を2文字分の幅で表示する。
+"set shiftwidth=2
+"set tabstop=2
+ 
+"------------------------------------------------------------
+" Mappings {{{1
+" マッピング
+"
+" Useful mappings
+ 
+" Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
+" which is the default
+" Yの動作をDやCと同じにする
+map Y y$
+ 
+" Map <C-L> (redraw screen) to also turn off search highlighting until the
+" next search
+" <C-L>で検索後の強調表示を解除する
+nnoremap <C-L> :nohl<CR><C-L>
+
+" .vimrc の編集を容易にする
+nnoremap <Space>. :<C-u>edit $MYVIMRC<Enter>
+nnoremap <Space>s. :<C-u>source $MYVIMRC<Enter>
+
+" Quickrun の実行
+nnoremap <Space>r :<C-u>QuickRun<Enter>
+
+" 論理行移動と表示行移動の入れ替え
+noremap j gj
+noremap k gk
+noremap gj j
+noremap gk k
+
+" Ex コマンドを入力しやすく
+noremap ; :
+
+" 個の設定をenable にしておくと、新規で Tab ( tc ) が使えない
+"noremap : ;
+
+" インサートモードでの移動
+noremap! <C-A> <Home>
+noremap! <C-E> <End>
+noremap! <C-F> <Right>
+noremap! <C-B> <Left>
+noremap! <C-D> <Del>
+noremap! <C-P> <Up>
+noremap! <C-N> <Down>
+
+"------------------------------------------------------------
+
+if &encoding !=# 'utf-8'
+  set encoding=japan
+  set fileencoding=japan
+endif
+if has('iconv')
+  let s:enc_euc = 'euc-jp'
+  let s:enc_jis = 'iso-2022-jp'
+  if iconv("\x87\x64\x87\x6a", 'cp932', 'eucjp-ms') ==# "\xad\xc5\xad\xcb"
+    let s:enc_euc = 'eucjp-ms'
+    let s:enc_jis = 'iso-2022-jp-3'
+  elseif iconv("\x87\x64\x87\x6a", 'cp932', 'euc-jisx0213') ==# "\xad\xc5\xad\xcb"
+    let s:enc_euc = 'euc-jisx0213'
+    let s:enc_jis = 'iso-2022-jp-3'
+  endif
+  if &encoding ==# 'utf-8'
+    let s:fileencodings_default = &fileencodings
+    if has('mac')
+      let &fileencodings = s:enc_jis .','. s:enc_euc
+      let &fileencodings = &fileencodings .','. s:fileencodings_default
+    else
+      let &fileencodings = s:enc_jis .','. s:enc_euc .',cp932'
+      let &fileencodings = &fileencodings .','. s:fileencodings_default
+    endif
+    unlet s:fileencodings_default
+  else
+    let &fileencodings = &fileencodings .','. s:enc_jis
+    set fileencodings+=utf-8,ucs-2le,ucs-2
+    if &encoding =~# '^\(euc-jp\|euc-jisx0213\|eucjp-ms\)$'
+      set fileencodings+=cp932
+      set fileencodings-=euc-jp
+      set fileencodings-=euc-jisx0213
+      set fileencodings-=eucjp-ms
+      let &encoding = s:enc_euc
+      let &fileencoding = s:enc_euc
+    else
+      let &fileencodings = &fileencodings .','. s:enc_euc
+    endif
+  endif
+  unlet s:enc_euc
+  unlet s:enc_jis
+endif
+
+"----------------------------------------------------
+" vim-indent-guides
+"----------------------------------------------------
+colorscheme delek
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_guide_size = 2
+
+
+"----------------------------------------------------
+" Tab Page Configuration
+"----------------------------------------------------
+
+" Anywhere SID.
+function! s:SID_PREFIX()
+  return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
+endfunction
+
+" Set tabline.
+function! s:my_tabline()  "{{{
+  let s = ''
+  for i in range(1, tabpagenr('$'))
+    let bufnrs = tabpagebuflist(i)
+    let bufnr = bufnrs[tabpagewinnr(i) - 1]  " first window, first appears
+    let no = i  " display 0-origin tabpagenr.
+    let mod = getbufvar(bufnr, '&modified') ? '!' : ' '
+    let title = fnamemodify(bufname(bufnr), ':t')
+    let title = '[' . title . ']'
+    let s .= '%'.i.'T'
+    let s .= '%#' . (i == tabpagenr() ? 'TabLineSel' : 'TabLine') . '#'
+    let s .= no . ':' . title
+    let s .= mod
+    let s .= '%#TabLineFill# '
+  endfor
+  let s .= '%#TabLineFill#%T%=%#TabLine#'
+  return s
+endfunction "}}}
+let &tabline = '%!'. s:SID_PREFIX() . 'my_tabline()'
+set showtabline=2 " 常にタブラインを表示
+
+" The prefix key.
+nnoremap    [Tag]   <Nop>
+nmap    t [Tag]
+" Tab jump
+for n in range(1, 9)
+  execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
+endfor
+" t1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
+
+" tc 新しいタブを一番右に作る
+map <silent> [Tag]c :tablast <bar> tabnew<CR>
+
+" tx タブを閉じる
+map <silent> [Tag]x :tabclose<CR>
+
+" tn 次のタブ
+map <silent> [Tag]n :tabnext<CR>
+
+map <silent> [Tag]p :tabprevious<CR>
+
+"----------------------------------------------------
+" VTreeExplorer
+"----------------------------------------------------
+"let g:treeExplVertical=1
+
+"----------------------------------------------------
+" jedi-vim
+"----------------------------------------------------
+"autocmd FileType python setlocal omnifunc=jedi#complete
+"
+"let g:jedi#auto_vim_configuration = 0
+"
+"if !exists('g:neocomplete#force_omni_input_patterns')
+"  let g:neocomplete#force_omni_input_patterns = {}
+"endif
+"
+"let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
+
+"----------------------------------------------------
+" neocomplete.vim
+"----------------------------------------------------
+
+" Disable AutoComplPop.
+let g:acp_enableAtStartup = 0
+
+" Use neocomplete.
+let g:neocomplete#enable_at_startup = 1
+
+" Use smartcase.
+let g:neocomplete#enable_smart_case = 1
+
+" Set minimum syntax keyword length.
+let g:neocomplete#sources#syntax#min_keyword_length = 10
+let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+
+let g:neocomplete#enable_fuzzy_completion  =  0
+
+" Define dictionary.
+let g:neocomplete#sources#dictionary#dictionaries = {
+    \ 'default' : '',
+    \ 'vimshell' : $HOME.'/.vimshell_hist',
+    \ 'scheme' : $HOME.'/.gosh_completions'
+        \ }
+
+" Define keyword.
+if !exists('g:neocomplete#keyword_patterns')
+    let g:neocomplete#keyword_patterns = {}
+endif
+let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+
+" Plugin key-mappings.
+inoremap <expr><C-g>     neocomplete#undo_completion()
+inoremap <expr><C-l>     neocomplete#complete_common_string()
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  return neocomplete#close_popup() . "\<CR>"
+  " For no inserting <CR> key.
+  "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+endfunction
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" <C-h>, <BS>: close popup and delete backword char.
+inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><C-y>  neocomplete#close_popup()
+inoremap <expr><C-e>  neocomplete#cancel_popup()
+" Close popup by <Space>.
+"inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+
+" For cursor moving in insert mode(Not recommended)
+"inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
+"inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
+"inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
+"inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
+" Or set this.
+"let g:neocomplete#enable_cursor_hold_i = 1
+" Or set this.
+"let g:neocomplete#enable_insert_char_pre = 1
+
+" AutoComplPop like behavior.
+"let g:neocomplete#enable_auto_select = 1
+
+" Shell like behavior(not recommended).
+"set completeopt+=longest
+"let g:neocomplete#enable_auto_select = 1
+"let g:neocomplete#disable_auto_complete = 1
+"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+
+" Enable omni completion.
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+" Enable heavy omni completion.
+if !exists('g:neocomplete#sources#omni#input_patterns')
+  let g:neocomplete#sources#omni#input_patterns = {}
+endif
+"let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+"let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+"let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+
+set completeopt-=preview
+
+" For perlomni.vim setting.
+" https://github.com/c9s/perlomni.vim
+
+"----------------------------------------------------
+" vim-quitrun
+"----------------------------------------------------
+
+"垂直分割
+"let g:quickrun_config={'*': {'split': 'vertical'}}
+
+"水平分割
+let g:quickrun_config={'*': {'split': ''}}
+
+"----------------------------------------------------
+" vim-smartchr
+"----------------------------------------------------
+inoremap <expr> = smartchr#loop(' = ', ' == ', '=')
+
+"----------------------------------------------------
+" neobundle.vim
+"----------------------------------------------------
+
+if has('vim_starting')
+  set nocompatible               " Be iMproved
+
+  " Required:
+  set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+
+" Required:
+call neobundle#rc(expand('~/.vim/bundle/'))
+
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" My Bundles here:
+NeoBundle 'Shougo/neosnippet.vim'
+NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'kien/ctrlp.vim'
+NeoBundle 'flazz/vim-colorschemes'
+NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'kevinw/pyflakes-vim'
+NeoBundle 'scrooloose/syntastic'
+NeoBundle 'vtreeexplorer'
+NeoBundle 'davidhalter/jedi-vim'
+NeoBundle 'Shougo/neocomplete.vim'
+NeoBundle 'thinca/vim-quickrun'
+NeoBundle 'kana/vim-smartchr.git'
+
+" You can specify revision/branch/tag.
+NeoBundle 'Shougo/vimshell', { 'rev' : '3787e5' }
+
+" Required:
+filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
+
