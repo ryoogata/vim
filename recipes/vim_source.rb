@@ -6,11 +6,6 @@
 #
 # All rights reserved - Do Not Redistribute
 #
-cookbook_file "/etc/profile.d/vim.sh" do
-    source "vim.sh"
-      mode "0644"
-end
-
 case node['platform']
 when "ubuntu"
   %w{
@@ -71,21 +66,6 @@ when "centos"
       make ; make install
     EOH
   end
-end
-
-directory "/root/.vim/bundle" do
-  action :create
-  recursive true
-end
-
-git "/root/.vim/bundle/neobundle.vim" do
-    repository "git://github.com/Shougo/neobundle.vim.git"
-    reference "master"
-    action :sync
-end
-
-cookbook_file "/root/.vimrc" do
-  source "vimrc"
 end
 
 script "exec-neoinstall" do
